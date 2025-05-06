@@ -60,11 +60,12 @@
                         {% endif %}
                     </td>
                 </tr>
-                {% else %}
+                {% endfor %}
+                {% if historico|length == 0 %}
                 <tr>
                     <td colspan="8" class="text-center">Nenhuma tarefa concluída!</td>
                 </tr>
-                {% endfor %}
+                {% endif %}
             </tbody>
         </table>
     </div>

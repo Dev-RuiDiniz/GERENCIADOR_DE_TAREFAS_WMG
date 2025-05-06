@@ -12,6 +12,8 @@
                 <tr>
                     <th>Tipo</th>
                     <th>Nome</th>
+                    <th>Criação</th>
+                    <th>Prazo</th>
                     <th>Conclusão</th>
                     <th>Status</th>
                     <th>Duração</th>
@@ -19,43 +21,45 @@
                 </tr>
             </thead>
             <tbody>
-                {% for tarefa in historico %}
-                <tr class="{% if tarefa.status_entrega() == 'atrasada' %}table-danger{% endif %}">
-                    <td>
-                        {% if tarefa.garantia %}
-                            <span class="badge bg-info text-dark">Garantia</span>
-                        {% else %}
-                            <span class="badge bg-primary">Serviço</span>
-                        {% endif %}
-                    </td>
-                    <td>{{ tarefa.nome }}</td>
-                    <td>{{ tarefa.data_criacao.strftime('%d/%m/%Y') }}</td>
-                    <td>{{ tarefa.data_entrega.strftime('%d/%m/%Y') }}</td>
-                    <td>{{ tarefa.data_conclusao.strftime('%d/%m/%Y') }}</td>
-                    <td>
-                        {% if tarefa.status_entrega() == 'atrasada' %}
-                            <span class="badge bg-danger">
-                                {% if tarefa.garantia %}Expirada{% else %}Atrasada{% endif %}
-                            </span>
-                        {% else %}
-                            <span class="badge bg-success">
-                                {% if tarefa.garantia %}Concluída{% else %}No prazo{% endif %}
-                            </span>
-                        {% endif %}
-                    </td>
-                    <td>{{ (tarefa.data_conclusao - tarefa.data_criacao).days }} dias</td>
-                    <td>
-                        <form method="POST" action="{{ url_for('excluir_tarefa', id=tarefa.id) }}"
-                              onsubmit="return confirm('Deseja realmente excluir este item do histórico?');">
-                            <button type="submit" class="btn btn-sm btn-danger">Excluir</button>
-                        </form>
-                    </td>
-                </tr>
+                {% if tarefas %}
+                    {% for tarefa in tarefas %}
+                    <tr class="{% if tarefa.status_entrega() == 'atrasada' %}table-danger{% endif %}">
+                        <td>
+                            {% if tarefa.garantia %}
+                                <span class="badge bg-info text-dark">Garantia</span>
+                            {% else %}
+                                <span class="badge bg-primary">Serviço</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ tarefa.nome }}</td>
+                        <td>{{ tarefa.data_criacao.strftime('%d/%m/%Y') }}</td>
+                        <td>{{ tarefa.data_entrega.strftime('%d/%m/%Y') }}</td>
+                        <td>{{ tarefa.data_conclusao.strftime('%d/%m/%Y') }}</td>
+                        <td>
+                            {% if tarefa.status_entrega() == 'atrasada' %}
+                                <span class="badge bg-danger">
+                                    {% if tarefa.garantia %}Expirada{% else %}Atrasada{% endif %}
+                                </span>
+                            {% else %}
+                                <span class="badge bg-success">
+                                    {% if tarefa.garantia %}Concluída{% else %}No prazo{% endif %}
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td>{{ (tarefa.data_conclusao - tarefa.data_criacao).days }} dias</td>
+                        <td>
+                            <form method="POST" action="{{ url_for('excluir_tarefa', id=tarefa.id) }}"
+                                  onsubmit="return confirm('Deseja realmente excluir este item do histórico?');">
+                                <button type="submit" class="btn btn-sm btn-danger">Excluir</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
                 {% else %}
                 <tr>
                     <td colspan="8" class="text-center">Nenhum item no histórico</td>
                 </tr>
-                {% endfor %}
+                {% endif %}
             </tbody>
         </table>
     </div>

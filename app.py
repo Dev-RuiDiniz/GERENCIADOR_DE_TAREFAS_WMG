@@ -89,36 +89,21 @@ def concluir_tarefa(tarefa_id):
 # Rota para tarefas com garantia
 @app.route('/garantia')
 def garantia():
-    tarefas_com_garantia = Tarefa.query.filter_by(garantia=True).order_by(Tarefa.data_entrega).all()
+    tarefas_com_garantia = Tarefa.query.filter_by(garantia=True, entregue=False, concluida=False).order_by(Tarefa.data_entrega).all()
     return render_template('garantia.html', garantia=tarefas_com_garantia)
 
 # Rota para tarefas prontas (concluídas, mas não entregues)
 @app.route('/prontos')
 def prontos():
-    tarefas_prontas = Tarefa.query.filter(Tarefa.concluida == True, Tarefa.entregue == False).order_by(Tarefa.data_conclusao.desc()).all()
-    return render_template('prontos.html', tarefas=tarefas_prontas)
+    tarefas_concluidas = Tarefa.query.filter_by(concluida=True, entregue=False).order_by(Tarefa.data_entrega.desc()).all()
+    return render_template('prontos.html', historico=tarefas_concluidas)
 
 # Rota para histórico (concluídas e entregues)
 @app.route('/historico')
 def historico():
     tarefas_concluidas = Tarefa.query.filter_by(concluida=True, entregue=True).order_by(Tarefa.data_conclusao.desc()).all()
+    return render_template('historico.html', tarefas=tarefas_concluidas)
     
-    historico = []
-
-    for tarefa in tarefas_concluidas:
-        historico.append({
-            'tipo': 'servico',
-            'id': tarefa.id,
-            'nome': tarefa.nome,
-            'data_criacao': tarefa.data_criacao,
-            'data_entrega': tarefa.data_entrega,
-            'data_conclusao': tarefa.data_conclusao,
-            'status': tarefa.status_entrega() if hasattr(tarefa, 'status_entrega') else '',
-            'dias_realizacao': (tarefa.data_conclusao - tarefa.data_criacao).days
-        })
-
-    historico.sort(key=lambda x: x['data_conclusao'], reverse=True)
-    return render_template('historico.html', historico=historico)
 
 # Excluir tarefa
 @app.route('/excluir_tarefa/<int:id>', methods=['POST'])
