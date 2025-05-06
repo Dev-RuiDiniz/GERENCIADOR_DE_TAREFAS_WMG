@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="mb-4">Adicionar Novo Serviço</h1>
+
+<form method="POST">
+    <div class="mb-3">
+        <label for="nome" class="form-label">Serviço</label>
+        <input type="text" class="form-control" id="nome" name="nome" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="descricao" class="form-label">Descrição</label>
+        <textarea class="form-control" id="descricao" name="descricao" rows="3"></textarea>
+    </div>
+
+    <div class="mb-3" id="prazo-container">
+        <label for="data_entrega" class="form-label">Prazo de Entrega</label>
+        <input type="date" class="form-control" id="data_entrega" name="data_entrega" required>
+    </div>
+
+    <div class="form-check form-switch mb-3">
+        <input class="form-check-input" type="checkbox" id="garantia" name="garantia">
+        <label class="form-check-label" for="garantia">Garantia</label>
+    </div>
+
+    <div class="form-check form-switch mb-3">
+        <input class="form-check-input" type="checkbox" id="declinada" name="declinada">
+        <label class="form-check-label" for="declinada">Declinada</label>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Adicionar</button>
+    <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancelar</a>
+</form>
+{% endblock %}

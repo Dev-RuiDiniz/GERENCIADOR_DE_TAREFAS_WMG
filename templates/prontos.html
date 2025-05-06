@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">Tarefas Concluídas, Mas Não Entregues</h1>
+
+    <a href="{{ url_for('index') }}" class="btn btn-primary mb-3">Voltar</a>
+
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Tipo</th>
+                    <th>Nome</th>
+                    <th>Criação/Início</th>
+                    <th>Entrega/Fim</th>
+                    <th>Conclusão</th>
+                    <th>Status</th>
+                    <th>Duração (dias)</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in historico %}
+                <tr class="{% if item.status_entrega() == 'atrasada' %}table-danger{% endif %}">
+                    <td>
+                        {% if item.garantia %}
+                            <span class="badge bg-info text-dark">Garantia</span>
+                        {% else %}
+                            <span class="badge bg-primary">Serviço</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ item.nome }}</td>
+                    <td>{{ item.data_criacao.strftime('%d/%m/%Y') }}</td>
+                    <td>{{ item.data_entrega.strftime('%d/%m/%Y') }}</td>
+                    <td>{{ item.data_conclusao.strftime('%d/%m/%Y') }}</td>
+                    <td>
+                        {% if item.status_entrega() == 'atrasada' %}
+                            <span class="badge bg-danger">Atrasada</span>
+                        {% else %}
+                            <span class="badge bg-success">No prazo</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ item.dias_para_entrega() }} dias</td>
+                    <td>
+                        <form method="POST" 
+                              action="{{ url_for('excluir_tarefa', id=item.id) }}" 
+                              onsubmit="return confirm('Deseja realmente excluir este item?');">
+                            <button type="submit" class="btn btn-sm btn-danger">Excluir</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="8" class="text-center">Nenhuma tarefa concluída e não entregue</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

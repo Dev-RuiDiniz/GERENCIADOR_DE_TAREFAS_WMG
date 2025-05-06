@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-4">Gerenciador de Serviços</h1>
+        <a href="{{ url_for('adicionar_tarefa') }}" class="btn btn-primary mb-3">Adicionar Serviço</a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>Serviço</th>
+                    <th>Descrição</th>
+                    <th>Prazo de Entrega</th>
+                    <th>Garantia</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tarefa in tarefas %}
+                <tr class="{% if tarefa.verificar_prazo() == 'atrasada' %}table-danger
+                           {% elif tarefa.verificar_prazo() == 'proximo' %}table-warning
+                           {% else %}table-success{% endif %}">
+                    <td>{{ tarefa.nome }}</td>
+                    <td>{{ tarefa.descricao or "Sem descrição" }}</td>
+                    <td>{{ tarefa.data_entrega.strftime('%d/%m/%Y') }}</td>
+                    <td>
+                        {% if tarefa.garantia %}
+                            <span class="badge bg-info text-dark">Sim</span>
+                        {% else %}
+                            <span class="badge bg-light text-dark">Não</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if tarefa.concluida %}
+                            <span class="badge bg-secondary">Concluída</span>
+                        {% elif tarefa.verificar_prazo() == 'atrasada' %}
+                            <span class="badge bg-danger">Atrasada</span>
+                        {% elif tarefa.verificar_prazo() == 'proximo' %}
+                            <span class="badge bg-warning text-dark">Prazo próximo</span>
+                        {% else %}
+                            <span class="badge bg-success">No prazo</span>
+                        {% endif %}
+                        <small class="d-block text-muted">({{ tarefa.dias_para_entrega() }} dias)</small>
+                    </td>
+                    <td class="text-nowrap">
+                        {% if not tarefa.concluida %}
+                        <a href="{{ url_for('concluir_tarefa', tarefa_id=tarefa.id) }}" class="btn btn-sm btn-success">Concluir</a>
+                        {% endif %}
+                        <a href="{{ url_for('editar_tarefa', tarefa_id=tarefa.id) }}" class="btn btn-sm btn-warning">Editar</a>
+                        <form method="POST" action="{{ url_for('excluir_tarefa', id=tarefa.id) }}" 
+                              onsubmit="return confirm('Deseja realmente excluir esta tarefa?');"
+                              style="display: inline;">
+                            <button type="submit" class="btn btn-sm btn-danger">Excluir</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="text-center py-4">
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i> Nenhum serviço cadastrado
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

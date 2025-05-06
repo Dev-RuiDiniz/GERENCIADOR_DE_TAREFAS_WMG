@@ -10,6 +10,7 @@ class Tarefa(db.Model):
     
     garantia = db.Column(db.Boolean, default=False) #se a tarefa é uma garantia
     declinada = db.Column(db.Boolean, default=False) #se a tarefa foi declinada
+    entregue = db.Column(db.Boolean, default=False)
 
     data_criacao = db.Column(db.Date, default=date.today) #data de criação da tarefa
     data_entrega = db.Column(db.Date, nullable=False) #prazo de entrega da tarefa
