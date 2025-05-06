@@ -164,6 +164,10 @@ def editar_tarefa(tarefa_id):
 
     return render_template('editar_tarefa.html', tarefa=tarefa)
 
+@app.route('/test')
+def test():
+    return 'Flask está funcionando!'
+
 # Inicializador
 if __name__ == '__main__':
     app.run(debug=True)
