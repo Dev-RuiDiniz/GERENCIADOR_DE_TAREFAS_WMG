@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
-from datetime import date, timedelta
+from datetime import date
 from models import db, Tarefa
 
 app = Flask(__name__)
@@ -81,7 +81,7 @@ def concluir_tarefa(tarefa_id):
 # Rota para tarefas com garantia
 @app.route('/garantia')
 def garantia():
-    garantias = Garantia.query.filter_by(garantia=True).order_by(Garantia.data_entrega).all()
+    garantias = Tarefa.query.filter_by(garantia=True).order_by(Tarefa.data_entrega).all()
     return render_template('garantia.html', garantias=garantias)
 
 # Rota para tarefas prontas (concluídas, mas não entregues)
@@ -94,8 +94,7 @@ def prontos():
 @app.route('/historico')
 def historico():
     tarefas_concluidas = Tarefa.query.filter_by(concluida=True, entregue=True).order_by(Tarefa.data_conclusao.desc()).all()
-    garantias_concluidas = Garantia.query.filter_by(concluida=True).order_by(Garantia.data_conclusao.desc()).all()
-
+    
     historico = []
 
     for tarefa in tarefas_concluidas:
@@ -108,19 +107,6 @@ def historico():
             'data_conclusao': tarefa.data_conclusao,
             'status': tarefa.status_entrega() if hasattr(tarefa, 'status_entrega') else '',
             'dias_realizacao': (tarefa.data_conclusao - tarefa.data_criacao).days
-        })
-
-    for garantia in garantias_concluidas:
-        status = 'concluida' if garantia.data_entrega >= garantia.data_conclusao else 'expirada'
-        historico.append({
-            'tipo': 'garantia',
-            'id': garantia.id,
-            'nome': garantia.nome,
-            'data_criacao': garantia.data_inicio,
-            'data_entrega': garantia.data_entrega,
-            'data_conclusao': garantia.data_conclusao,
-            'status': status,
-            'dias_realizacao': (garantia.data_conclusao - garantia.data_inicio).days
         })
 
     historico.sort(key=lambda x: x['data_conclusao'], reverse=True)
