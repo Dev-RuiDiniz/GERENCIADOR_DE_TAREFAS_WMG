@@ -15,7 +15,7 @@ with app.app_context():
 # Rota principal
 @app.route('/')
 def index():
-    tarefas = Tarefa.query.filter_by(concluida=False).order_by(Tarefa.data_entrega).all()
+    tarefas = Tarefa.query.filter_by(concluida=False, garantia=False).order_by(Tarefa.data_entrega).all()
     hoje = date.today()
 
     for tarefa in tarefas:

@@ -13,7 +13,7 @@
                     <th>Tipo</th>
                     <th>Nome</th>
                     <th>Criação/Início</th>
-                    <th>Conclusão</th>
+                    <th>Prazo de Entrega</th>
                     <th>Status</th>
                     <th>Duração (dias)</th>
                     <th>Ações</th>
@@ -32,7 +32,6 @@
                     <td>{{ item.nome }}</td>
                     <td>{{ item.data_criacao.strftime('%d/%m/%Y') }}</td>
                     <td>{{ item.data_entrega.strftime('%d/%m/%Y') }}</td>
-                    <td>{{ item.data_conclusao.strftime('%d/%m/%Y') }}</td>
                     <td>
                         {% if item.status_entrega() == 'atrasada' %}
                             <span class="badge bg-danger">Atrasada</span>
