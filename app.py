@@ -80,7 +80,7 @@ def concluir_tarefa(tarefa_id):
 
 # Rota para tarefas com garantia
 @app.route('/garantia')
-def garantia():
+def garantias():
     garantias = Tarefa.query.filter_by(garantia=True).order_by(Tarefa.data_entrega).all()
     return render_template('garantia.html', garantias=garantias)
 
@@ -125,7 +125,15 @@ def excluir_tarefa(id):
         db.session.rollback()
         flash('Erro ao excluir tarefa.', 'danger')
 
-    return redirect(url_for('historico'))
+    return redirect(url_for('prontos'))
+
+@app.route('/tarefa/<int:tarefa_id>/entregue', methods=['POST'])
+def marcar_entregue(tarefa_id):
+    tarefa = Tarefa.query.get_or_404(tarefa_id)
+    tarefa.entregue = True
+    db.session.commit()
+    flash('Tarefa marcada como entregue com sucesso!', 'success')
+    return redirect(request.referrer or url_for('historico'))
 
 # Editar tarefa
 @app.route('/editar_tarefa/<int:tarefa_id>', methods=['GET', 'POST'])

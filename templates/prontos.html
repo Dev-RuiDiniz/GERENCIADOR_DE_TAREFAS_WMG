@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="container">
-    <h1 class="mb-4">Tarefas Concluídas, Mas Não Entregues</h1>
+    <h1 class="mb-4">Prontos para Entrega</h1>
 
     <a href="{{ url_for('index') }}" class="btn btn-primary mb-3">Voltar</a>
 
@@ -13,7 +13,6 @@
                     <th>Tipo</th>
                     <th>Nome</th>
                     <th>Criação/Início</th>
-                    <th>Entrega/Fim</th>
                     <th>Conclusão</th>
                     <th>Status</th>
                     <th>Duração (dias)</th>
@@ -45,14 +44,25 @@
                     <td>
                         <form method="POST" 
                               action="{{ url_for('excluir_tarefa', id=item.id) }}" 
-                              onsubmit="return confirm('Deseja realmente excluir este item?');">
+                              onsubmit="return confirm('Deseja realmente excluir este item?');"
+                              style="display: inline;">
                             <button type="submit" class="btn btn-sm btn-danger">Excluir</button>
                         </form>
+
+                        {% if not item.entregue %}
+                        <form method="POST" 
+                              action="{{ url_for('marcar_entregue', tarefa_id=item.id) }}" 
+                              style="display: inline;">
+                            <button type="submit" class="btn btn-sm btn-outline-success">Marcar como Entregue</button>
+                        </form>
+                        {% else %}
+                        <span class="badge bg-success">Entregue</span>
+                        {% endif %}
                     </td>
                 </tr>
                 {% else %}
                 <tr>
-                    <td colspan="8" class="text-center">Nenhuma tarefa concluída e não entregue</td>
+                    <td colspan="8" class="text-center">Nenhuma tarefa concluída!</td>
                 </tr>
                 {% endfor %}
             </tbody>
