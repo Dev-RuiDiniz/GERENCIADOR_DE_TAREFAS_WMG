@@ -20,9 +20,8 @@
                 </tr>
             </thead>
             <tbody>
-                {% set garantias = tarefas|selectattr("garantia")|list %}
-                {% if garantias %}
-                    {% for tarefa in garantias %}
+                {% if garantia %}
+                    {% for tarefa in garantia %}
                     <tr class="{% if tarefa.verificar_prazo() == 'atrasada' %}table-danger
                                {% elif tarefa.verificar_prazo() == 'proximo' %}table-warning
                                {% else %}table-success{% endif %}">

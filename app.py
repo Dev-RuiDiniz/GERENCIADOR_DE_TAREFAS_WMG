@@ -28,20 +28,21 @@ def index():
 
     return render_template('index.html', tarefas=tarefas, hoje=hoje)
 
-# Adicionar tarefa
 @app.route('/adicionar_tarefa', methods=['GET', 'POST'])
 def adicionar_tarefa():
     if request.method == 'POST':
         nome = request.form.get('nome', '').strip()
         descricao = request.form.get('descricao', '').strip()
         data_entrega_str = request.form.get('data_entrega', '')
+        garantia = 'garantia' in request.form
+        declinada = 'declinada' in request.form
 
         if not nome:
             flash('O nome da tarefa é obrigatório.', 'danger')
             return redirect(url_for('adicionar_tarefa'))
 
         try:
-            data_entrega = date.fromisoformat(data_entrega_str)  # Usando apenas a parte de data
+            data_entrega = date.fromisoformat(data_entrega_str)
             if data_entrega < date.today():
                 flash('A data de entrega não pode ser no passado!', 'danger')
                 return redirect(url_for('adicionar_tarefa'))
@@ -49,7 +50,13 @@ def adicionar_tarefa():
             flash('Formato de data inválido. Use YYYY-MM-DD.', 'danger')
             return redirect(url_for('adicionar_tarefa'))
 
-        nova_tarefa = Tarefa(nome=nome, descricao=descricao, data_entrega=data_entrega)
+        nova_tarefa = Tarefa(
+            nome=nome,
+            descricao=descricao,
+            data_entrega=data_entrega,
+            garantia=garantia,
+            declinada=declinada
+        )
 
         try:
             db.session.add(nova_tarefa)
@@ -61,6 +68,7 @@ def adicionar_tarefa():
             flash('Erro ao adicionar tarefa.', 'danger')
 
     return render_template('adicionar_tarefa.html')
+
 
 # Concluir tarefa
 @app.route('/concluir_tarefa/<int:tarefa_id>')
@@ -80,9 +88,9 @@ def concluir_tarefa(tarefa_id):
 
 # Rota para tarefas com garantia
 @app.route('/garantia')
-def garantias():
-    garantias = Tarefa.query.filter_by(garantia=True).order_by(Tarefa.data_entrega).all()
-    return render_template('garantia.html', garantias=garantias)
+def garantia():
+    tarefas_com_garantia = Tarefa.query.filter_by(garantia=True).order_by(Tarefa.data_entrega).all()
+    return render_template('garantia.html', garantia=tarefas_com_garantia)
 
 # Rota para tarefas prontas (concluídas, mas não entregues)
 @app.route('/prontos')
@@ -144,13 +152,15 @@ def editar_tarefa(tarefa_id):
         nome = request.form.get('nome', '').strip()
         descricao = request.form.get('descricao', '').strip()
         data_entrega_str = request.form.get('data_entrega', '')
+        garantia = 'garantia' in request.form
+        declinada = 'declinada' in request.form
 
         if not nome:
             flash('O nome da tarefa é obrigatório.', 'danger')
             return redirect(url_for('editar_tarefa', tarefa_id=tarefa.id))
 
         try:
-            nova_data = date.fromisoformat(data_entrega_str)  # Usando apenas a parte de data
+            nova_data = date.fromisoformat(data_entrega_str)
             if nova_data < date.today():
                 flash('A data de entrega não pode ser no passado!', 'danger')
                 return redirect(url_for('editar_tarefa', tarefa_id=tarefa.id))
@@ -161,6 +171,8 @@ def editar_tarefa(tarefa_id):
 
         tarefa.nome = nome
         tarefa.descricao = descricao
+        tarefa.garantia = garantia
+        tarefa.declinada = declinada
 
         try:
             db.session.commit()
@@ -171,6 +183,7 @@ def editar_tarefa(tarefa_id):
             flash('Erro ao atualizar tarefa.', 'danger')
 
     return render_template('editar_tarefa.html', tarefa=tarefa)
+
 
 @app.route('/test')
 def test():
