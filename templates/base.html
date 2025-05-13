@@ -37,7 +37,7 @@
             position: absolute;
             top: 15px;
             left: 15px;
-            z-index: 1030; /* Acima do navbar */
+            z-index: 1030;
             width: 250px;
             opacity: 0.85;
         }
@@ -56,10 +56,9 @@
         nav.navbar {
             z-index: 1020;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            padding-left: 280px; /* Espaço para o logo */
+            padding-left: 280px;
         }
 
-        /* Estilo do botão moderno verde claro */
         .btn-modern {
             background: linear-gradient(135deg, #7ed56f, #55c57a);
             border: none;
@@ -74,12 +73,19 @@
             letter-spacing: 0.5px;
             margin: 0 5px;
         }
-        
+
         .btn-modern:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
             color: white;
             background: linear-gradient(135deg, #55c57a, #28b485);
+        }
+
+        #timer-controls {
+            position: absolute;
+            top: 12px;
+            right: 20px;
+            z-index: 1040;
         }
 
         @media (max-width: 992px) {
@@ -99,7 +105,13 @@
 <body>
     <img src="{{ url_for('static', filename='img/logo_topo.png') }}" alt="Logo" class="logo-topo">
 
-    <!-- Navbar com botões verdes -->
+    <!-- Timer e Controle -->
+    <div id="timer-controls" class="d-flex align-items-center gap-2">
+        <button id="toggle-timer" class="btn btn-sm btn-outline-primary">Pausar rotação</button>
+        <span>Troca em <span id="countdown">60</span>s</span>
+    </div>
+
+    <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container-fluid">
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -124,6 +136,7 @@
         </div>
     </nav>
 
+    <!-- Conteúdo -->
     <div class="container mt-4">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
@@ -139,6 +152,40 @@
         {% block content %}{% endblock %}
     </div>
 
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let timerActive = true;
+        let intervalSeconds = 60;
+        let remainingSeconds = intervalSeconds;
+
+        const countdownElement = document.getElementById('countdown');
+        const toggleButton = document.getElementById('toggle-timer');
+        const navButtons = document.querySelectorAll('.navbar-nav .nav-item a');
+
+        let currentButton = parseInt(localStorage.getItem('currentButtonIndex')) || 0;
+        if (currentButton >= navButtons.length) currentButton = 0;
+
+        function countdownTick() {
+            if (!timerActive) return;
+
+            remainingSeconds--;
+            countdownElement.textContent = remainingSeconds;
+
+            if (remainingSeconds <= 0) {
+                currentButton = (currentButton + 1) % navButtons.length;
+                localStorage.setItem('currentButtonIndex', currentButton);
+                window.location.href = navButtons[currentButton].href;
+                remainingSeconds = intervalSeconds;
+            }
+        }
+
+        toggleButton.addEventListener('click', () => {
+            timerActive = !timerActive;
+            toggleButton.textContent = timerActive ? 'Pausar' : 'Ativar';
+        });
+
+        setInterval(countdownTick, 1000);
+    </script>
 </body>
 </html>
